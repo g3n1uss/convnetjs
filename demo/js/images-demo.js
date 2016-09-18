@@ -1,12 +1,136 @@
+ // ------------------------
+  // BEGIN MNIST SPECIFIC STUFF
+  // ------------------------
+  classes_txt = ['0','1','2','3','4','5','6','7','8','9'];
+  var dataset_name = "mnist";
+  var num_batches = 21; // 20 training batches, 1 test
+  var test_batch = 20;
+  var num_samples_per_batch = 3000;
+  var image_dimension = 28;
+  var image_channels = 1;
+  var use_validation_data = true;
+  var random_flip = false;
+  var random_position = false;
+  // ------------------------
+  // END MNIST SPECIFIC STUFF
+  // ------------------------
+
+var data_img_elts = new Array(num_batches);
+var img_data = new Array(num_batches);
+var loaded = new Array(num_batches);
+var loaded_train_batches = [];
+var lossGraph = new cnnvis.Graph();
+var xLossWindow = new cnnutil.Window(100);
+var wLossWindow = new cnnutil.Window(100);
+var trainAccWindow = new cnnutil.Window(100);
+var valAccWindow = new cnnutil.Window(100);
+var testAccWindow = new cnnutil.Window(50, 1);
+var step_num = 0;
+
+// int main
+
+// use jQuery to evaluate everything inside this function after the page is loaded
+$(window).load(function() {
+
+  // put the string 't' into the textbox 'newnet'
+  $("#newnet").val(t);
+
+  // read back the configuration of the network from the textbox 'newnet' 
+  // and evaluate the interior of the corresponding string (it will create the network of the desired 
+  // configuration and a trainer)
+  eval($("#newnet").val());
+
+  net = new convnetjs.Net();
+  net.makeLayers(layer_defs);
+  trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
+
+  // read off the rest of the parameters as defaults from the trainer
+  // if the configuration has been changed - update it
+  update_net_param_display();
+
+  // what is this loop doing? just setting all the elements of loaded to false? why?
+  for(var k=0;k<loaded.length;k++) { loaded[k] = false; }
+
+  //load zeroth batch (training batch) and 21st (testing), the rest 19 training batches will be loaded 
+  //while the network is training on the zeroth one in 'sample_training_instance()'
+  load_data_batch(0);
+
+  // test_batch=20 (defined at mnist page, get rid of this variable?)
+  load_data_batch(test_batch);
+
+  // run the function 'load_and_step' though this auxiliary function, which checks wheather 
+  // the batches are loaded
+  start_fun();
+});
+
+// load parameters as the values defined in the trainer. If this is the first run - read off 
+// from the default parameters of the trainer
+var update_net_param_display = function() {
+  document.getElementById('lr_input').value = trainer.learning_rate;
+  document.getElementById('momentum_input').value = trainer.momentum;
+  document.getElementById('batch_size_input').value = trainer.batch_size;
+  document.getElementById('decay_input').value = trainer.l2_decay;
+}
+
+// load the dataset with JS in background
+var load_data_batch = function(batch_num) {
+  data_img_elts[batch_num] = new Image();
+  var data_img_elt = data_img_elts[batch_num];
+  // async batch load, happens after the path to batch is set (function following this one) whenever 
+  // the broweser has some time, this time is allocated by function 'start_fun' via 'setTimeout'
+  data_img_elt.onload = function() { 
+    var data_canvas = document.createElement('canvas');
+    data_canvas.width = data_img_elt.width;
+    data_canvas.height = data_img_elt.height;
+    var data_ctx = data_canvas.getContext("2d");
+    data_ctx.drawImage(data_img_elt, 0, 0); // copy it over... bit wasteful :(
+    img_data[batch_num] = data_ctx.getImageData(0, 0, data_canvas.width, data_canvas.height);
+    loaded[batch_num] = true;
+    if(batch_num < test_batch) { loaded_train_batches.push(batch_num); }
+    console.log('finished loading data batch ' + batch_num);
+  };
+  // set the path to the batch, whenever there is a free time the data will be loaded  by 
+  // the above function. The broweser decides if there is a free time in 'start_fun', that 
+  // function gives a brower time to load data via setTimeout, it allows the program to 
+  // proceed (call load_and_step) if both batches are loaded
+  data_img_elt.src = dataset_name + "/" + dataset_name + "_batch_" + batch_num + ".png";
+}
+
+// run function 'load_and_step' after loading both training and testing batches
+var start_fun = function() {
+  if(loaded[0] && loaded[test_batch]) { 
+    console.log('starting!'); 
+    setInterval(load_and_step, 0); // lets go!
+  }
+  else { setTimeout(start_fun, 200); } // keep checking
+}
+
+// load a training image and train on it with the network
+var paused = false;
+// train unless paused
+var load_and_step = function() {
+  if(paused) return; 
+
+  var sample = sample_training_instance();
+  step(sample); // process this image
+  
+  //setTimeout(load_and_step, 0); // schedule the next iteration
+}
+
+// generate a training sample
 var sample_training_instance = function() {
   // find an unloaded batch
+
+  // 'loaded_train_batches' contains loaded batches pushed in 'load_data_batch' via async load
   var bi = Math.floor(Math.random()*loaded_train_batches.length);
   var b = loaded_train_batches[bi];
-  var k = Math.floor(Math.random()*num_samples_per_batch); // sample within the batch
+  var k = Math.floor(Math.random()*num_samples_per_batch); // pick a random sample within the batch
   var n = b*num_samples_per_batch+k;
 
   // load more batches over time
   if(step_num%(2 * num_samples_per_batch)===0 && step_num>0) {
+    // after completely working out the current sample 'step_num' is incremented in function 'step()' 
+    // in the web version '2*num_samples_per_batch' is replaced by 5000, it does not change much?
     for(var i=0;i<num_batches;i++) {
       if(!loaded[i]) {
         // load it
@@ -20,6 +144,8 @@ var sample_training_instance = function() {
   var p = img_data[b].data;
   var x = new convnetjs.Vol(image_dimension,image_dimension,image_channels,0.0);
   var W = image_dimension*image_dimension;
+  // the following part is very different from the web version, but does not make much difference
+  /*
   var j=0;
   for(var dc=0;dc<image_channels;dc++) {
     var i=0;
@@ -40,10 +166,94 @@ var sample_training_instance = function() {
 
   if(random_flip){
     x = convnetjs.augment(x, image_dimension, 0, 0, Math.random()<0.5); //maybe flip horizontally
+  }*/
+
+  // code from the web version
+  for(var i=0;i<W;i++) {
+    var ix = ((W * k) + i) * 4;
+    x.w[i] = p[ix]/255.0;
   }
+  x = convnetjs.augment(x, 24);
+
+
 
   var isval = use_validation_data && n%10===0 ? true : false;
   return {x:x, label:labels[n], isval:isval};
+}
+
+// train on the picked sample
+var step = function(sample) {
+
+  var x = sample.x;
+  var y = sample.label;
+
+  if(sample.isval) {
+    // use x to build our estimate of validation error
+    net.forward(x);
+    var yhat = net.getPrediction();
+    var val_acc = yhat === y ? 1.0 : 0.0;
+    valAccWindow.add(val_acc);
+    return; // get out
+  }
+
+  // train on it with network
+  var stats = trainer.train(x, y);
+  var lossx = stats.cost_loss;
+  var lossw = stats.l2_decay_loss;
+
+  // keep track of stats such as the average training error and loss
+  var yhat = net.getPrediction();
+  var train_acc = yhat === y ? 1.0 : 0.0;
+  xLossWindow.add(lossx);
+  wLossWindow.add(lossw);
+  trainAccWindow.add(train_acc);
+
+  // visualize training status
+  var train_elt = document.getElementById("trainstats");
+  train_elt.innerHTML = '';
+  var t = 'Forward time per example: ' + stats.fwd_time + 'ms';
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'Backprop time per example: ' + stats.bwd_time + 'ms';
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'Classification loss: ' + f2t(xLossWindow.get_average());
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'L2 Weight decay loss: ' + f2t(wLossWindow.get_average());
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'Training accuracy: ' + f2t(trainAccWindow.get_average());
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'Validation accuracy: ' + f2t(valAccWindow.get_average());
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+  var t = 'Examples seen: ' + step_num;
+  train_elt.appendChild(document.createTextNode(t));
+  train_elt.appendChild(document.createElement('br'));
+
+  // visualize activations
+  if(step_num % 100 === 0) {
+    var vis_elt = document.getElementById("visnet");
+    visualize_activations(net, vis_elt);
+  }
+
+  // log progress to graph, (full loss)
+  if(step_num % 200 === 0) {
+    var xa = xLossWindow.get_average();
+    var xw = wLossWindow.get_average();
+    if(xa >= 0 && xw >= 0) { // if they are -1 it means not enough data was accumulated yet for estimates
+      lossGraph.add(step_num, xa + xw);
+      lossGraph.drawSelf(document.getElementById("lossgraph"));
+    }
+  }
+
+  // run prediction on test set
+  if((step_num % 100 === 0 && step_num > 0) || step_num===100) {
+    test_predict();
+  }
+  step_num++;
 }
 
 // sample a random testing instance
@@ -96,51 +306,9 @@ var sample_test_instance = function() {
 }
 
 
-var data_img_elts = new Array(num_batches);
-var img_data = new Array(num_batches);
-var loaded = new Array(num_batches);
-var loaded_train_batches = [];
 
-// int main
-$(window).load(function() {
 
-  $("#newnet").val(t);
-  eval($("#newnet").val());
 
-  update_net_param_display();
-
-  for(var k=0;k<loaded.length;k++) { loaded[k] = false; }
-
-  load_data_batch(0); // async load train set batch 0
-  load_data_batch(test_batch); // async load test set
-  start_fun();
-});
-
-var start_fun = function() {
-  if(loaded[0] && loaded[test_batch]) { 
-    console.log('starting!'); 
-    setInterval(load_and_step, 0); // lets go!
-  }
-  else { setTimeout(start_fun, 200); } // keep checking
-}
-
-var load_data_batch = function(batch_num) {
-  // Load the dataset with JS in background
-  data_img_elts[batch_num] = new Image();
-  var data_img_elt = data_img_elts[batch_num];
-  data_img_elt.onload = function() { 
-    var data_canvas = document.createElement('canvas');
-    data_canvas.width = data_img_elt.width;
-    data_canvas.height = data_img_elt.height;
-    var data_ctx = data_canvas.getContext("2d");
-    data_ctx.drawImage(data_img_elt, 0, 0); // copy it over... bit wasteful :(
-    img_data[batch_num] = data_ctx.getImageData(0, 0, data_canvas.width, data_canvas.height);
-    loaded[batch_num] = true;
-    if(batch_num < test_batch) { loaded_train_batches.push(batch_num); }
-    console.log('finished loading data batch ' + batch_num);
-  };
-  data_img_elt.src = dataset_name + "/" + dataset_name + "_batch_" + batch_num + ".png";
-}
 
 var maxmin = cnnutil.maxmin;
 var f2t = cnnutil.f2t;
@@ -388,16 +556,7 @@ var visualize_activations = function(net, elt) {
   }
 }
 
-// loads a training image and trains on it with the network
-var paused = false;
-var load_and_step = function() {
-  if(paused) return; 
 
-  var sample = sample_training_instance();
-  step(sample); // process this image
-  
-  //setTimeout(load_and_step, 0); // schedule the next iteration
-}
 
 // evaluate current network on test set
 var test_predict = function() {
@@ -495,86 +654,7 @@ var testImage = function(img) {
   }
 }
 
-var lossGraph = new cnnvis.Graph();
-var xLossWindow = new cnnutil.Window(100);
-var wLossWindow = new cnnutil.Window(100);
-var trainAccWindow = new cnnutil.Window(100);
-var valAccWindow = new cnnutil.Window(100);
-var testAccWindow = new cnnutil.Window(50, 1);
-var step_num = 0;
-var step = function(sample) {
 
-  var x = sample.x;
-  var y = sample.label;
-
-  if(sample.isval) {
-    // use x to build our estimate of validation error
-    net.forward(x);
-    var yhat = net.getPrediction();
-    var val_acc = yhat === y ? 1.0 : 0.0;
-    valAccWindow.add(val_acc);
-    return; // get out
-  }
-
-  // train on it with network
-  var stats = trainer.train(x, y);
-  var lossx = stats.cost_loss;
-  var lossw = stats.l2_decay_loss;
-
-  // keep track of stats such as the average training error and loss
-  var yhat = net.getPrediction();
-  var train_acc = yhat === y ? 1.0 : 0.0;
-  xLossWindow.add(lossx);
-  wLossWindow.add(lossw);
-  trainAccWindow.add(train_acc);
-
-  // visualize training status
-  var train_elt = document.getElementById("trainstats");
-  train_elt.innerHTML = '';
-  var t = 'Forward time per example: ' + stats.fwd_time + 'ms';
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'Backprop time per example: ' + stats.bwd_time + 'ms';
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'Classification loss: ' + f2t(xLossWindow.get_average());
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'L2 Weight decay loss: ' + f2t(wLossWindow.get_average());
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'Training accuracy: ' + f2t(trainAccWindow.get_average());
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'Validation accuracy: ' + f2t(valAccWindow.get_average());
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-  var t = 'Examples seen: ' + step_num;
-  train_elt.appendChild(document.createTextNode(t));
-  train_elt.appendChild(document.createElement('br'));
-
-  // visualize activations
-  if(step_num % 100 === 0) {
-    var vis_elt = document.getElementById("visnet");
-    visualize_activations(net, vis_elt);
-  }
-
-  // log progress to graph, (full loss)
-  if(step_num % 200 === 0) {
-    var xa = xLossWindow.get_average();
-    var xw = wLossWindow.get_average();
-    if(xa >= 0 && xw >= 0) { // if they are -1 it means not enough data was accumulated yet for estimates
-      lossGraph.add(step_num, xa + xw);
-      lossGraph.drawSelf(document.getElementById("lossgraph"));
-    }
-  }
-
-  // run prediction on test set
-  if((step_num % 100 === 0 && step_num > 0) || step_num===100) {
-    test_predict();
-  }
-  step_num++;
-}
 
 // user settings 
 var change_lr = function() {
@@ -593,12 +673,7 @@ var change_decay = function() {
   trainer.l2_decay = parseFloat(document.getElementById("decay_input").value);
   update_net_param_display();
 }
-var update_net_param_display = function() {
-  document.getElementById('lr_input').value = trainer.learning_rate;
-  document.getElementById('momentum_input').value = trainer.momentum;
-  document.getElementById('batch_size_input').value = trainer.batch_size;
-  document.getElementById('decay_input').value = trainer.l2_decay;
-}
+
 var toggle_pause = function() {
   paused = !paused;
   var btn = document.getElementById('buttontp');
