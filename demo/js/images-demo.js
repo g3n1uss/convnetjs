@@ -186,7 +186,7 @@ var sample_training_instance = function() {
   return {x:x, label:labels[n], isval:isval};
 }
 
-// train on the picked sample
+// train on the picked sample and visualize the process
 var step = function(sample) {
 
   var x = sample.x;
@@ -213,7 +213,7 @@ var step = function(sample) {
   wLossWindow.add(lossw);
   trainAccWindow.add(train_acc);
 
-  // visualize training status
+  // print training status
   var train_elt = document.getElementById("trainstats");
   train_elt.innerHTML = '';
   var t = 'Forward time per example: ' + stats.fwd_time + 'ms';
@@ -311,8 +311,7 @@ var sample_test_instance = function() {
 }
 
 
-
-
+// visualize and test network
 
 
 var maxmin = cnnutil.maxmin;
@@ -622,44 +621,6 @@ var test_predict = function() {
   testAccWindow.add(num_correct/num_total);
   $("#testset_acc").text('test accuracy based on last 200 test images: ' + testAccWindow.get_average());  
 }
-var testImage = function(img) {
-  var x = convnetjs.img_to_vol(img);
-  var out_p = net.forward(x);
-
-
-  var vis_elt = document.getElementById("visnet");
-  visualize_activations(net, vis_elt);
-
-  var preds =[]
-  for(var k=0;k<out_p.w.length;k++) { preds.push({k:k,p:out_p.w[k]}); }
-  preds.sort(function(a,b){return a.p<b.p ? 1:-1;});
-
-  // add predictions
-  var div = document.createElement('div');
-  div.className = 'testdiv';
-
-  // draw the image into a canvas
-  draw_activations_COLOR(div, x, 2);
-
-  var probsdiv = document.createElement('div');
-
-
-  var t = '';
-  for(var k=0;k<3;k++) {
-    var col = k===0 ? 'rgb(85,187,85)' : 'rgb(187,85,85)';
-    t += '<div class=\"pp\" style=\"width:' + Math.floor(preds[k].p/1*100) + 'px; background-color:' + col + ';\">' + classes_txt[preds[k].k] + '</div>'
-  }
-  
-  probsdiv.innerHTML = t;
-  probsdiv.className = 'probsdiv';
-  div.appendChild(probsdiv);
-
-  // add it into DOM
-  $(div).prependTo($("#testset_vis")).hide().fadeIn('slow').slideDown('slow');
-  if($(".probsdiv").length>200) {
-    $("#testset_vis > .probsdiv").last().remove(); // pop to keep upper bound of shown items
-  }
-}
 
 // user settings
 
@@ -673,23 +634,7 @@ var setTrainerParams = function(){
   update_net_param_display();
 }
 
-/*var change_lr = function() {
-  trainer.learning_rate = parseFloat(document.getElementById("lr_input").value);
-  update_net_param_display();
-}
-var change_momentum = function() {
-  trainer.momentum = parseFloat(document.getElementById("momentum_input").value);
-  update_net_param_display();
-}
-var change_batch_size = function() {
-  trainer.batch_size = parseFloat(document.getElementById("batch_size_input").value);
-  update_net_param_display();
-}
-var change_decay = function() {
-  trainer.l2_decay = parseFloat(document.getElementById("decay_input").value);
-  update_net_param_display();
-}*/
-
+// pause
 var toggle_pause = function() {
   paused = !paused;
   var btn = document.getElementById('buttontp');
