@@ -8,6 +8,9 @@
   <meta name="author" content="">
   <link rel="stylesheet" href="css/style.css">
 
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+
 <!-- Load additional libs -->
 <script src="js/jquery-1.8.3.min.js"></script>
 <script src="../build/vis.js"></script>
@@ -40,7 +43,8 @@
   \n\
   trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});\n\
   ";*/
-  // CAN WE REPLACE CONFIGURING THE NETWORK THOUGH STRING BY BUILDING THE CONFIGURATION AS LEGO?
+  // CAN WE REPLACE CONFIGURING THE NETWORK BY BUILDING THE CONFIGURATION AS LEGO?
+  // ADD PARAMETERS OF TRAINER IN ADDITIONAL BOX
 </script>
 <script src="js/images-demo.js">
   // everything happens in this lib
@@ -61,13 +65,106 @@
     By default, in this demo we're using Adadelta which is one of per-parameter adaptive step size methods, so we don't have to worry about changing learning rates or momentum over time. However, I still included the text fields for changing these if you'd like to play around with SGD+Momentum trainer.
   </p>
   <p>Report questions/bugs/suggestions to <a href="https://twitter.com/karpathy">@karpathy</a>.</p>
+
+  <h1>Choose a Network Configuration</h1>
+  <div>
+    <textarea id="newnet" style="width:100%; height:200px;"></textarea><br />
+    <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
+  </div>
+
+  <h1>Set up the Trainer</h1>
+  <!--<div>
+    <form action="#" onsubmit="return setTrainerParams(this);">
+    Training method:<input type="text" id="train_method"><br>
+    Learning rate:<input type="text" id="lr_input"><br>
+    Momentum:<input type="text" id="momentum_input"><br>
+    Batch size:<input type="text" id="batch_size_input"><br>
+    Weight decay:<input type="text" id="decay_input"><br>
+    <input type="submit" value="Change Trainer Parameters">
+    </form>
+
+  </div>-->
+
+<!-- TODO: change trainer method to a drop-down list -->
+  <form class="pure-form pure-form-stacked">
+    <fieldset>
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Training method</label>
+                <input id="train_method" class="pure-u-23-24" type="text">
+            </div>
+
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Learning rate</label>
+                <input id="lr_input" class="pure-u-23-24" type="text">
+            </div>
+
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Momentum</label>
+                <input id="momentum_input" class="pure-u-23-24" type="text">
+            </div>
+
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Batch size</label>
+                <input id="batch_size_input" class="pure-u-23-24" type="text">
+            </div>
+
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Weight decay</label>
+                <input id="decay_input" class="pure-u-23-24" type="text">
+            </div>
+
+            <div class="pure-u-1 pure-u-md-1-3">
+                <label>Epsilon</label>
+                <input id="epsilon_input" class="pure-u-23-24" type="text">
+            </div>
+        </div>
+
+        <button type="submit" class="pure-button pure-button-active">Change Trainer</button>
+    </fieldset>
+</form>
+
+<!--<form class="pure-form pure-form-aligned" action="#" onsubmit="return setTrainerParams(this);">
+    <fieldset>
+        <div class="pure-control-group">
+            <label for="name">Training method</label>
+            <input id="train_method" type="text" placeholder="Training method">
+        </div>
+
+        <div class="pure-control-group">
+            <label for="name">Learning rate</label>
+            <input id="lr_input" type="text" placeholder="Learning rate">
+        </div>
+
+        <div class="pure-control-group">
+            <label for="name">Momentum</label>
+            <input id="momentum_input" type="text" placeholder="Momentum">
+        </div>
+
+        <div class="pure-control-group">
+            <label for="name">Batch size</label>
+            <input id="batch_size_input" type="text" placeholder="Batch size">
+        </div>
+
+        <div class="pure-control-group">
+            <label for="name">Weight decay</label>
+            <input id="decay_input" type="text" placeholder="Weight decay">
+        </div>
+
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">Change Trainer</button>
+        </div>
+    </fieldset>
+</form>-->
+
+
   <h1>Training Stats</h1>
   <div class="divsec" style="270px;">
     <div class="secpart">
       <input id="buttontp" type="submit" value="pause" onclick="toggle_pause();" style="width: 100px; height:30px; background-color: #FCC;"/>
       <div id="trainstats"></div>
 
-      <div id="controls">
+      <!--<div id="controls">
         Learning rate: <input name="lri" type="text" maxlength="20" id="lr_input"/>
         <input id="buttonlr" type="submit" value="change" onclick="change_lr();"/>
         <br />
@@ -82,7 +179,7 @@
 
         Weight decay: <input name="wdi" type="text" maxlength="20" id="decay_input"/>
         <input id="buttonwd" type="submit" value="change" onclick="change_decay();"/>
-      </div>
+      </div>-->
 
       <input id="buttondj" type="submit" value="save network snapshot as JSON" onclick="dump_json();"/><br />
       <input id="buttonlfj" type="submit" value="init network from JSON snapshot" onclick="load_from_json();"/><br />
@@ -111,11 +208,7 @@
     <div style="clear:both;"></div>
   </div>
 
-  <h1>Instantiate a Network and Trainer</h1>
-  <div>
-    <textarea id="newnet" style="width:100%; height:200px;"></textarea><br />
-    <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
-  </div>
+
 
   <div class="divsec">
   <h1>Network Visualization</h1>
@@ -125,7 +218,7 @@
   <div class="divsec">
   <h1>Example predictions on Test set</h1>
     <div id="testset_acc"></div>
-	<div id="testset_vis"></div>
+	<div id="testset_vis"></div><!--this part is rewritten in the web version to bound appearing of new images. In its current version they keep popping up -->
   </div>
 
   </div>  

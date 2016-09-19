@@ -27,6 +27,9 @@ var valAccWindow = new cnnutil.Window(100);
 var testAccWindow = new cnnutil.Window(50, 1);
 var step_num = 0;
 
+// keep 'images_per_page' images per page in the prediction section (Example predictions on Test set)
+var images_per_page=20;
+
 // int main
 
 // use jQuery to evaluate everything inside this function after the page is loaded
@@ -66,10 +69,12 @@ $(window).load(function() {
 // load parameters as the values defined in the trainer. If this is the first run - read off 
 // from the default parameters of the trainer
 var update_net_param_display = function() {
+  document.getElementById('train_method').value = trainer.method;
   document.getElementById('lr_input').value = trainer.learning_rate;
   document.getElementById('momentum_input').value = trainer.momentum;
   document.getElementById('batch_size_input').value = trainer.batch_size;
   document.getElementById('decay_input').value = trainer.l2_decay;
+  document.getElementById('epsilon_input').value = trainer.eps;
 }
 
 // load the dataset with JS in background
@@ -608,8 +613,11 @@ var test_predict = function() {
 
     // add it into DOM
     $(div).prependTo($("#testset_vis")).hide().fadeIn('slow').slideDown('slow');
-    if($(".probsdiv").length>200) {
-      $("#testset_vis > .probsdiv").last().remove(); // pop to keep upper bound of shown items
+    // if there are more than 'images_per_page' pictures - remove the last one, keep always 20 images
+    if($("#testset_vis")[0].childElementCount>images_per_page) {
+      var list=document.getElementById("testset_vis");
+      list.removeChild(list.childNodes[images_per_page]);
+      //$("#testset_vis > .probsdiv").last().remove(); // pop to keep upper bound of shown items
     }
   }
   testAccWindow.add(num_correct/num_total);
@@ -654,10 +662,19 @@ var testImage = function(img) {
   }
 }
 
+// user settings
 
+// set the trainer parameters
+var setTrainerParams = function(){
+  trainer.learning_rate = parseFloat(document.getElementById("lr_input").value);
+  trainer.momentum = parseFloat(document.getElementById("momentum_input").value);
+  trainer.batch_size = parseFloat(document.getElementById("batch_size_input").value);
+  trainer.l2_decay = parseFloat(document.getElementById("decay_input").value);
+  trainer.eps = parseFloat(document.getElementById("eps_input").value);
+  update_net_param_display();
+}
 
-// user settings 
-var change_lr = function() {
+/*var change_lr = function() {
   trainer.learning_rate = parseFloat(document.getElementById("lr_input").value);
   update_net_param_display();
 }
@@ -672,7 +689,7 @@ var change_batch_size = function() {
 var change_decay = function() {
   trainer.l2_decay = parseFloat(document.getElementById("decay_input").value);
   update_net_param_display();
-}
+}*/
 
 var toggle_pause = function() {
   paused = !paused;
