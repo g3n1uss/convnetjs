@@ -617,7 +617,6 @@ var test_predict = function() {
     if($("#testset_vis")[0].childElementCount>images_per_page) {
       var list=document.getElementById("testset_vis");
       list.removeChild(list.childNodes[images_per_page]);
-      //$("#testset_vis > .probsdiv").last().remove(); // pop to keep upper bound of shown items
     }
   }
   testAccWindow.add(num_correct/num_total);
