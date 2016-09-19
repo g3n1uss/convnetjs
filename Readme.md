@@ -3,7 +3,7 @@
 
 This project is a redesigned, improved (in my opinion) version of the [original project](https://github.com/karpathy/convnetjs). For now it contains only a single example - the MNIST classifier.
 
-A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network).
+A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network). Thw whole idea of using convolutional NN can be summarized by the following [!picture](http://cs231n.github.io/assets/nn1/neural_net2.jpeg).
 
 Other resources:
 * [Original paper](http://www.mitpressjournals.org/doi/abs/10.1162/neco.1989.1.4.541) by LeCun et al - application of convolutional NN to recognition of handwritten zip codes https://www.ics.uci.edu/~welling/teaching/273ASpring09/lecun-89e.pdf  
