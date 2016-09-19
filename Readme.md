@@ -3,7 +3,14 @@
 
 This project is a redesigned, improved (in my opinion) version of the [original project](https://github.com/karpathy/convnetjs). For now it contains only a single example - the MNIST classifier.
 
-A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network). Thw whole idea of using convolutional NN can be summarized by the following [!picture](http://cs231n.github.io/assets/nn1/neural_net2.jpeg).
+A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network). To summarize convolutional neural networks are used to solve the [overfitting problem](https://en.wikipedia.org/wiki/Overfitting#Machine_learning), when one has too many weights to fit the curve. A single fully-connected neuron (used in ordinary NN) taking as input small colorful images, let’s say 32x32 pixels, would require 32x32x3=3072 weights. It seems ok, but usually we want several such neurons, also the input images might be bigger, which would drastically increase the number of weights (parameters), which definitely would lead to overfitting. In convolutional networks the neurons in a layer are connected only to a small region of the previous layer, which eliminates overfitting.
+
+Let's compare the regular deep nueral network and the convolutional one (images are taken from [here](http://cs231n.github.io/convolutional-networks/)) 
+
+  <img src="http://cs231n.github.io/assets/nn1/neural_net2.jpeg" width="40%" />
+  <img src="http://cs231n.github.io/assets/cnn/cnn.jpeg" width="48%" style="border-left: 1px solid black;"/>
+  
+  Left: A regular 3-layer Neural Network. Right: A ConvNet arranges its neurons in three dimensions (width, height, depth), as visualized in one of the layers. Every layer of a ConvNet transforms the 3D input volume to a 3D output volume of neuron activations. In this example, the red input layer holds the image, so its width and height would be the dimensions of the image, and the depth would be 3 (Red, Green, Blue channels).
 
 Other resources:
 * [Original paper](http://www.mitpressjournals.org/doi/abs/10.1162/neco.1989.1.4.541) by LeCun et al - application of convolutional NN to recognition of handwritten zip codes https://www.ics.uci.edu/~welling/teaching/273ASpring09/lecun-89e.pdf  
