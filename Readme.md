@@ -3,6 +3,8 @@
 
 This project is a redesigned, improved (in my opinion) version of the [original project](https://github.com/karpathy/convnetjs). For now it contains only a single example - the MNIST classifier.
 
+## Introduction
+
 A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network). To summarize convolutional neural networks are used to solve the [overfitting problem](https://en.wikipedia.org/wiki/Overfitting#Machine_learning), when one has too many weights to fit the curve. A single fully-connected neuron (used in ordinary NN) taking as input small colorful images, let’s say 32x32 pixels, would require 32x32x3=3072 weights. It seems ok, but usually we want several such neurons, also the input images might be bigger, which would drastically increase the number of weights (parameters), which definitely would lead to overfitting. In convolutional networks the neurons in a layer are connected only to a small region of the previous layer, which eliminates overfitting.
 
 Let's compare the regular deep nueral network and the convolutional one (images are taken from [here](http://cs231n.github.io/convolutional-networks/)) 
