@@ -6,9 +6,13 @@ This project is a redesigned, improved (in my opinion) version of the [original 
 A very nice introduction to convolutional networks can be found [here](http://cs231n.github.io/convolutional-networks/) and [here](https://en.wikipedia.org/wiki/Convolutional_neural_network).
 
 Other resources:
-* Original paper - application of convolutional NN to recognition of handwritten zip codes https://www.ics.uci.edu/~welling/teaching/273ASpring09/lecun-89e.pdf  
+* [Original paper](http://www.mitpressjournals.org/doi/abs/10.1162/neco.1989.1.4.541) by LeCun et al - application of convolutional NN to recognition of handwritten zip codes https://www.ics.uci.edu/~welling/teaching/273ASpring09/lecun-89e.pdf  
 * Applying of convolutional neural networks to classify colorful images https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf 
-* Introducing visualization of each level to see how and why convolutional networks work introduced in the previous paper work http://www.matthewzeiler.com/pubs/arxive2013/arxive2013.pdf 
+* Introducing visualization of each level to see how and why convolutional networks introduced in the previous paper work http://www.matthewzeiler.com/pubs/arxive2013/arxive2013.pdf 
+
+Recent developments:
+* [Conditional image generation](https://arxiv.org/abs/1606.05328 )
+* [Text-to-speech generation](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
 
 ## Example Code
 
