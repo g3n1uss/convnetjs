@@ -33,12 +33,6 @@
   layer_defs.push({type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'});\n\
   layer_defs.push({type:'pool', sx:2, stride:2});\n\
   layer_defs.push({type:'softmax', num_classes:10});"
-  /*\n\
-  net = new convnetjs.Net();\n\
-  net.makeLayers(layer_defs);\n\
-  \n\
-  trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});\n\
-  ";*/
   // CAN WE REPLACE CONFIGURING THE NETWORK BY BUILDING THE CONFIGURATION AS LEGO?
   // ADD PARAMETERS OF TRAINER IN ADDITIONAL BOX
 </script>
@@ -49,38 +43,25 @@
 </head>
 <body>
   <div id="wrap">
-  <h2 style="text-align: center;"><a href="http://cs.stanford.edu/people/karpathy/convnetjs/">ConvNetJS</a> MNIST demo</h2>
+  <h2 style="text-align: center;"><a href="http://cs.stanford.edu/people/karpathy/convnetjs/">ConvNetJS</a> MNIST demo (forked version of <a href="http://cs.stanford.edu/people/karpathy/convnetjs/demo/mnist.html">this</a>)</h2>
   <h1>Description</h1>
   <p>
-    This demo trains a Convolutional Neural Network on the <a href="http://yann.lecun.com/exdb/mnist/">MNIST digits dataset</a> in your browser, with nothing but Javascript. The dataset is fairly easy and one should expect to get somewhere around 99% accuracy within few minutes. I used <a href="mnist_parse.zip">this python script</a> to parse the <a href="http://deeplearning.net/tutorial/gettingstarted.html">original files</a> into batches of images that can be easily loaded into page DOM with img tags.
+    This demo trains a Convolutional Neural Network on the <a href="http://yann.lecun.com/exdb/mnist/">MNIST digits dataset</a> in your browser, with nothing but Javascript. The dataset is fairly easy and one should expect to get somewhere around 99% accuracy within few minutes. <a href="mnist_parse.zip">This python script</a> was used to parse the <a href="http://deeplearning.net/tutorial/gettingstarted.html">original files</a> into batches of images that can be easily loaded into page DOM with img tags.
   </p>
   <p>
-    This network takes a 28x28 MNIST image and crops a random 24x24 window before training on it (this technique is called data augmentation and improves generalization). Similarly to do prediction, 4 random crops are sampled and the probabilities across all crops are averaged to produce final predictions. The network runs at about 5ms for both forward and backward pass on my reasonably decent Ubuntu+Chrome machine.
+    This network takes a 28x28 MNIST image and crops a random 24x24 window (although you can choose different window size) before training on it (this technique is called data augmentation and improves generalization). Similarly to do prediction, 4 random crops are sampled and the probabilities across all crops are averaged to produce final predictions. The network runs at about 5ms for both forward and backward pass on my reasonably decent Ubuntu+Chrome machine.
   </p>
   <p>
     By default, in this demo we're using Adadelta which is one of per-parameter adaptive step size methods, so we don't have to worry about changing learning rates or momentum over time. However, I still included the text fields for changing these if you'd like to play around with SGD+Momentum trainer.
   </p>
-  <p>Report questions/bugs/suggestions to <a href="https://twitter.com/karpathy">@karpathy</a>.</p>
 
-  <h1>Choose a Network Configuration</h1>
+  <h1>Choose the Network Configuration</h1>
   <div>
     <textarea id="newnet" style="width:100%; height:200px;"></textarea><br />
     <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
   </div>
 
   <h1>Set up the Trainer</h1>
-  <!--<div>
-    <form action="#" onsubmit="return setTrainerParams(this);">
-    Training method:<input type="text" id="train_method"><br>
-    Learning rate:<input type="text" id="lr_input"><br>
-    Momentum:<input type="text" id="momentum_input"><br>
-    Batch size:<input type="text" id="batch_size_input"><br>
-    Weight decay:<input type="text" id="decay_input"><br>
-    <input type="submit" value="Change Trainer Parameters">
-    </form>
-
-  </div>-->
-
 <!-- TODO: change trainer method to a drop-down list -->
   <form class="pure-form pure-form-stacked" action="#" onsubmit="return setTrainerParams();">
     <fieldset>
@@ -119,40 +100,6 @@
         <button type="submit" class="pure-button pure-button-active">Change Trainer</button>
     </fieldset>
 </form>
-
-<!--<form class="pure-form pure-form-aligned" action="#" onsubmit="return setTrainerParams(this);">
-    <fieldset>
-        <div class="pure-control-group">
-            <label for="name">Training method</label>
-            <input id="train_method" type="text" placeholder="Training method">
-        </div>
-
-        <div class="pure-control-group">
-            <label for="name">Learning rate</label>
-            <input id="lr_input" type="text" placeholder="Learning rate">
-        </div>
-
-        <div class="pure-control-group">
-            <label for="name">Momentum</label>
-            <input id="momentum_input" type="text" placeholder="Momentum">
-        </div>
-
-        <div class="pure-control-group">
-            <label for="name">Batch size</label>
-            <input id="batch_size_input" type="text" placeholder="Batch size">
-        </div>
-
-        <div class="pure-control-group">
-            <label for="name">Weight decay</label>
-            <input id="decay_input" type="text" placeholder="Weight decay">
-        </div>
-
-        <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Change Trainer</button>
-        </div>
-    </fieldset>
-</form>-->
-
 
   <h1>Training Stats</h1>
   <div class="divsec" style="270px;">
@@ -214,7 +161,7 @@
   <div class="divsec">
   <h1>Example predictions on Test set</h1>
     <div id="testset_acc"></div>
-	<div id="testset_vis"></div><!--this part is rewritten in the web version to bound appearing of new images. In its current version they keep popping up -->
+	<div id="testset_vis"></div>
   </div>
 
   </div>  
