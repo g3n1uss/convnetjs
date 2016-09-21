@@ -134,7 +134,7 @@ var sample_training_instance = function() {
 
   // load more batches over time
   if(step_num%(2 * num_samples_per_batch)===0 && step_num>0) {
-    // after completely working out the current sample 'step_num' is incremented in function 'step()' 
+    // after the current sample is completely worked out, 'step_num' is incremented in function 'step()' 
     // in the web version '2*num_samples_per_batch' is replaced by 5000, it does not change much?
     for(var i=0;i<num_batches;i++) {
       if(!loaded[i]) {
@@ -562,7 +562,7 @@ var visualize_activations = function(net, elt) {
 
 
 
-// evaluate current network on test set
+// evaluate current network on test set and visualize predictions
 var test_predict = function() {
   var num_classes = net.layers[net.layers.length-1].out_depth;
 
@@ -612,7 +612,8 @@ var test_predict = function() {
 
     // add it into DOM
     $(div).prependTo($("#testset_vis")).hide().fadeIn('slow').slideDown('slow');
-    // if there are more than 'images_per_page' pictures - remove the last one, keep always 20 images
+    // keep always 'images_per_page' images
+    // if there are more than 'images_per_page' pictures - remove the last one
     if($("#testset_vis")[0].childElementCount>images_per_page) {
       var list=document.getElementById("testset_vis");
       list.removeChild(list.childNodes[images_per_page]);
@@ -630,8 +631,7 @@ var setTrainerParams = function(){
   trainer.momentum = parseFloat(document.getElementById("momentum_input").value);
   trainer.batch_size = parseFloat(document.getElementById("batch_size_input").value);
   trainer.l2_decay = parseFloat(document.getElementById("decay_input").value);
-  trainer.eps = parseFloat(document.getElementById("eps_input").value);
-  update_net_param_display();
+  trainer.eps = parseFloat(document.getElementById("epsilon_input").value);
 }
 
 // pause
@@ -647,20 +647,7 @@ var dump_json = function() {
 var clear_graph = function() {
   lossGraph = new cnnvis.Graph(); // reinit graph too 
 }
-var reset_all = function() {
-  // reinit trainer
-  trainer = new convnetjs.SGDTrainer(net, {learning_rate:trainer.learning_rate, momentum:trainer.momentum, batch_size:trainer.batch_size, l2_decay:trainer.l2_decay});
-  update_net_param_display();
 
-  // reinit windows that keep track of val/train accuracies
-  xLossWindow.reset();
-  wLossWindow.reset();
-  trainAccWindow.reset();
-  valAccWindow.reset();
-  testAccWindow.reset();
-  lossGraph = new cnnvis.Graph(); // reinit graph too
-  step_num = 0;
-}
 var load_from_json = function() {
   var jsonString = document.getElementById("dumpjson").value;
   var json = JSON.parse(jsonString);
@@ -684,4 +671,17 @@ var load_pretrained = function() {
 var change_net = function() {
   eval($("#newnet").val());
   reset_all();
+}
+
+var reset_all = function() {
+  // reinit trainer
+  trainer = new convnetjs.SGDTrainer(net, {learning_rate:trainer.learning_rate, momentum:trainer.momentum, batch_size:trainer.batch_size, l2_decay:trainer.l2_decay});
+  // reinit windows that keep track of val/train accuracies
+  xLossWindow.reset();
+  wLossWindow.reset();
+  trainAccWindow.reset();
+  valAccWindow.reset();
+  testAccWindow.reset();
+  lossGraph = new cnnvis.Graph(); // reinit graph too
+  step_num = 0;
 }
