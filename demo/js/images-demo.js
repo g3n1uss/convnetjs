@@ -32,19 +32,23 @@ var images_per_page=20;
 
 // int main
 
+net = new convnetjs.Net();
+
+// It seems like we do not need this function anymore if we are going to create the network configuration by loading the default settings
 // use jQuery to evaluate everything inside this function after the page is loaded
 $(window).load(function() {
 
+  // CREATE STRING T FROM THE DEFAULT CONFIGURATION OF THE NETWORK!!
   // put the string 't' into the textbox 'newnet'
   $("#newnet").val(t);
 
   // read back the configuration of the network from the textbox 'newnet' 
   // and evaluate the interior of the corresponding string (it will create the network of the desired 
   // configuration and a trainer)
-  eval($("#newnet").val());
+  //eval($("#newnet").val());
 
-  net = new convnetjs.Net();
-  net.makeLayers(layer_defs);
+  //net = new convnetjs.Net();
+  // net.makeLayers(layer_defs);
   trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
 
   // read off the rest of the parameters as defaults from the trainer
@@ -669,7 +673,16 @@ var load_pretrained = function() {
 }
 
 var change_net = function() {
-  eval($("#newnet").val());
+  //eval($("#newnet").val());
+  var newlayerslist=this.newnet.value.split( "\n" );
+  // load the default configuration
+  var newlayersconf=[];
+  for (var i=0;i<newlayerslist.length;i++){
+    newlayersconf.push(eval('({'+newlayerslist[i]+'})'));
+  }
+  // the following code will translate the configuration of layers as simple array 'layers_conf'' into the set of objects
+  var xx=1;
+  net.makeLayers(newlayersconf);
   reset_all();
 }
 

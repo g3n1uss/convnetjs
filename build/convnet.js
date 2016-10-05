@@ -1522,10 +1522,19 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
   var Vol = global.Vol; // convenience
   var assert = global.assert;
 
+
   // Net manages a set of layers
   // For now constraints: Simple linear order of layers, first layer input last layer a cost layer
   var Net = function(options) {
     this.layers = [];
+    // load the default configuration
+    this.layers_conf=[];
+    this.layers_conf.push({type:'input', out_sx:24, out_sy:24, out_depth:1});
+    this.layers_conf.push({type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'});
+    this.layers_conf.push({type:'pool', sx:2, stride:2});
+    this.layers_conf.push({type:'softmax', num_classes:10});
+    // the following code will translate the configuration of layers as simple array 'layers_conf'' into the set of objects
+    this.makeLayers(this.layers_conf);
   }
 
   Net.prototype = {

@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <link rel="stylesheet" href="css/style.css">
-
+<!-- Load CSS -->
   <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
   <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
 
@@ -19,7 +19,7 @@
 <script src="mnist/mnist_labels.js"></script>
 
 <script type="text/javascript">
-   var layer_defs, net, trainer;
+   var layer_defs;
   // we can consider the following simplified configuration (one layer of each type)
   // it makes the network to converge slower, but it is easier to debug
 
@@ -28,11 +28,10 @@
   // this technique is called data augmentation
 
   // The number of filters is chosen empirically, other numbers of filters work pretty good too
-  var t = "layer_defs = [];\n\
-  layer_defs.push({type:'input', out_sx:24, out_sy:24, out_depth:1});\n\
-  layer_defs.push({type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'});\n\
-  layer_defs.push({type:'pool', sx:2, stride:2});\n\
-  layer_defs.push({type:'softmax', num_classes:10});"
+  var t = "type:'input', out_sx:24, out_sy:24, out_depth:1\n\
+type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'\n\
+type:'pool', sx:2, stride:2\n\
+type:'softmax', num_classes:10"
   // CAN WE REPLACE CONFIGURING THE NETWORK BY BUILDING THE CONFIGURATION AS LEGO?
   // ADD PARAMETERS OF TRAINER IN ADDITIONAL BOX
 </script>
@@ -55,13 +54,37 @@
     By default, in this demo we're using Adadelta which is one of per-parameter adaptive step size methods, so we don't have to worry about changing learning rates or momentum over time. However, I still included the text fields for changing these if you'd like to play around with SGD+Momentum trainer.
   </p>
 
-  <h1>Choose the Network Configuration</h1>
+  <h1>Specify the Network Configuration</h1>
+
+GENERATE THE NETWORK CONFIGURATION FROM THE LAYER PARAMETERS!
+
+  Layers are separated by line break.
   <div>
     <textarea id="newnet" style="width:100%; height:200px;"></textarea><br />
     <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
   </div>
 
-  <h1>Set up the Trainer</h1>
+
+<!--
+<h2>Set up the network configuration</h1>
+<div id="NetworkConfiguration"></div>
+<script type="text/javascript">
+  var tableElementContainer1 = document.getElementById("NetworkConfiguration"),
+    temptableHolder  = '<form class="pure-form pure-form-aligned action="#" onsubmit="return change_net1();"><fieldset>';
+        for(var i=0,len=net.layers_conf.length; i<len; i++){
+          var props_text='';
+          Object.getOwnPropertyNames(net.layers_conf[i]).forEach(function(val, idx, array) {
+            props_text+=val +':'+ net.layers_conf[i][val];
+              });
+          var x=net.layers_conf[i].toString();
+          temptableHolder  += '<div class="pure-control-group"><label>Layer '+ i +'</label><input id="'+net.layers_conf[i]+'" type="text"></div>';
+              }
+            temptableHolder += '<button type="submit" class="pure-button pure-button-primary">Submit</button></div></fieldset></form>';
+    tableElementContainer1.innerHTML  = temptableHolder ;
+</script>-->
+
+
+<h1>Set up the Trainer</h1>
 <!-- TODO: change trainer method to a drop-down list -->
   <form class="pure-form pure-form-stacked" action="#" onsubmit="return setTrainerParams();">
     <fieldset>
@@ -99,7 +122,7 @@
 
         <button type="submit" class="pure-button pure-button-active">Change Trainer</button>
     </fieldset>
-</form>
+  </form>
 
   <h1>Training Stats</h1>
   <div class="divsec" style="270px;">
