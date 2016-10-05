@@ -673,15 +673,15 @@ var load_pretrained = function() {
 }
 
 var change_net = function() {
-  //eval($("#newnet").val());
+  // read off the configuration of the network and parse it
+  // layers are separated by line breaks
   var newlayerslist=this.newnet.value.split( "\n" );
-  // load the default configuration
+  // cast the configuration into the array
   var newlayersconf=[];
   for (var i=0;i<newlayerslist.length;i++){
     newlayersconf.push(eval('({'+newlayerslist[i]+'})'));
   }
   // the following code will translate the configuration of layers as simple array 'layers_conf'' into the set of objects
-  var xx=1;
   net.makeLayers(newlayersconf);
   reset_all();
 }

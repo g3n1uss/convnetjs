@@ -33,7 +33,6 @@ type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'\n\
 type:'pool', sx:2, stride:2\n\
 type:'softmax', num_classes:10"
   // CAN WE REPLACE CONFIGURING THE NETWORK BY BUILDING THE CONFIGURATION AS LEGO?
-  // ADD PARAMETERS OF TRAINER IN ADDITIONAL BOX
 </script>
 <script src="js/images-demo.js">
   // everything happens in this lib
@@ -56,11 +55,11 @@ type:'softmax', num_classes:10"
 
   <h1>Specify the Network Configuration</h1>
 
-GENERATE THE NETWORK CONFIGURATION FROM THE LAYER PARAMETERS!
+GENERATE THE NETWORK CONFIGURATION FROM THE PARAMETERS OF THE NETWORK!
 
   Layers are separated by line break.
   <div>
-    <textarea id="newnet" style="width:100%; height:200px;"></textarea><br />
+    <textarea id="newnet" style="width:100%; height:150px;"></textarea><br />
     <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
   </div>
 
