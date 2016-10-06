@@ -32,24 +32,16 @@ var images_per_page=20;
 
 // int main
 
-net = new convnetjs.Net();
-
-// It seems like we do not need this function anymore if we are going to create the network configuration by loading the default settings
 // use jQuery to evaluate everything inside this function after the page is loaded
+// first create all the elements within the document, then assign them values
 $(window).load(function() {
 
-  // CREATE STRING T FROM THE DEFAULT CONFIGURATION OF THE NETWORK!!
-  // put the string 't' into the textbox 'newnet'
-  $("#newnet").val(t);
+  net = new convnetjs.Net();
+  document.getElementById('newnet').value=net.conf_string
 
-  // read back the configuration of the network from the textbox 'newnet' 
-  // and evaluate the interior of the corresponding string (it will create the network of the desired 
-  // configuration and a trainer)
-  //eval($("#newnet").val());
-
-  //net = new convnetjs.Net();
-  // net.makeLayers(layer_defs);
+  // set up the trainer
   trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
+  
 
   // read off the rest of the parameters as defaults from the trainer
   // if the configuration has been changed - update it

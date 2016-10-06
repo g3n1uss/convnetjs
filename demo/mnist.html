@@ -18,22 +18,6 @@
 <script src="../build/convnet.js"></script>
 <script src="mnist/mnist_labels.js"></script>
 
-<script type="text/javascript">
-   var layer_defs;
-  // we can consider the following simplified configuration (one layer of each type)
-  // it makes the network to converge slower, but it is easier to debug
-
-  // Can we remove the definition of the input layer, because it can be read off from the input data?
-  // It cannot be done because the program randomly crops 28x28 images down to 24x24, 
-  // this technique is called data augmentation
-
-  // The number of filters is chosen empirically, other numbers of filters work pretty good too
-  var t = "type:'input', out_sx:24, out_sy:24, out_depth:1\n\
-type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'\n\
-type:'pool', sx:2, stride:2\n\
-type:'softmax', num_classes:10"
-  // CAN WE REPLACE CONFIGURING THE NETWORK BY BUILDING THE CONFIGURATION AS LEGO?
-</script>
 <script src="js/images-demo.js">
   // everything happens in this lib
 </script>
@@ -54,17 +38,14 @@ type:'softmax', num_classes:10"
   </p>
 
   <h1>Specify the Network Configuration</h1>
-
-GENERATE THE NETWORK CONFIGURATION FROM THE PARAMETERS OF THE NETWORK!
-
-  Layers are separated by line break.
+  Enter the network configuration. Layers are separated by the line break.
   <div>
     <textarea id="newnet" style="width:100%; height:150px;"></textarea><br />
     <input id="buttonnn" type="submit" value="change network" onclick="change_net();" style="width:200px;height:30px;"/>
   </div>
 
 
-<!--
+<!--LEGO-LIKE CONFIGURATION OF THE NETWORK, MB FINISH LATER
 <h2>Set up the network configuration</h1>
 <div id="NetworkConfiguration"></div>
 <script type="text/javascript">
