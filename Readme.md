@@ -1,7 +1,7 @@
 
 # ConvNetJS
 
-This project is a redesigned, improved (in my opinion) version of the [original project](https://github.com/karpathy/convnetjs). For now it contains only a single example - the MNIST classifier.
+The purpose of this project was to get some experience in JavaScript and learn convolutional neural networks. Many workarounds present in the [original project](https://github.com/karpathy/convnetjs) have been removed (although some are very diffucult to get rid of) such as setting up the network configuration as a string coming from inside the HTML code and then reading it back. For now it contains only one example - the MNIST classifier.
 
 ## Introduction
 
