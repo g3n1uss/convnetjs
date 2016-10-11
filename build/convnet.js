@@ -1529,7 +1529,7 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
     this.layers = [];
     // load the default configuration
     // keep the configuration as a string
-    this.conf_string="type:'input', out_sx:24, out_sy:24, out_depth:1\n\ type:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'\n\ type:'pool', sx:2, stride:2\n\ type:'softmax', num_classes:10";
+    this.conf_string="type:'input', out_sx:24, out_sy:24, out_depth:1\ntype:'conv', sx:5, filters:8, stride:1, pad:2, activation:'relu'\ntype:'pool', sx:2, stride:2\ntype:'softmax', num_classes:10";
     // layers are separated by line breaks
     var newlayerslist=this.conf_string.split( "\n" );
     // cast the configuration into the array
