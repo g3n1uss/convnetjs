@@ -93,7 +93,7 @@ var output_probabilities_vol = net.forward(x)
 
 ## Getting Started
 
-To run the demo just open `mnist.html`, it will be launched automatically. It works on Firefox, however, it will not work on Chrome. Due to the following problem:
+To run the demo just open `mnist.html`, it will be launched automatically. It works in Firefox, but not in Chrome due to the following problem:
 > In some cases, if you are trying to load images or other data dynamically, you might run into issues with running local html files and cross-origin policies. For example, the MNIST or CIFAR demos will not work locally because they load images dynamically. A simple work-around is to run a dummy local web server in your folder. On Ubuntu for example, cd into it, start up one: python -m SimpleHTTPServer, and then navigate to the local address that python prints for you in your browser to see your files in that folder.
 
 So to run the demo in Chome:
