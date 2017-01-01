@@ -138,7 +138,6 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
 })(convnetjs);
 (function(global) {
   "use strict";
-
   // Input is convertered into Volume and passed through the net. 
   // c is an optional parameter, which is used to initialize the volume.
   // If c is missing, fills the Vol with random numbers.
