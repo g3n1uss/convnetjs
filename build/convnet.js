@@ -139,15 +139,11 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
 (function(global) {
   "use strict";
 
-  // Vol is the basic building block of all data in a net.
-  // it is essentially just a 3D volume of numbers, with a
-  // width (sx), height (sy), and depth (depth).
-  // it is used to hold data for all filters, all volumes,
-  // all weights, and also stores all gradients w.r.t. 
-  // the data. c is optionally a value to initialize the volume
-  // with. If c is missing, fills the Vol with random numbers.
+  // Input is convertered into Volume and passed through the net. 
+  // c is an optional parameter, which is used to initialize the volume.
+  // If c is missing, fills the Vol with random numbers.
   var Vol = function(sx, sy, depth, c) {
-    // this is how you check if a variable is an array. Oh, Javascript :)
+    // this is how you check if the considered variable is in an array. Oh, Javascript :)
     if(Object.prototype.toString.call(sx) === '[object Array]') {
       // we were given a list in sx, assume 1D volume and fill it up
       this.sx = 1;
