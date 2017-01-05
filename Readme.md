@@ -102,6 +102,16 @@ So to run the demo in Chome:
 2. run the python server in that directory `python -m SimpleHTTPServer` 
 3. open Chrome and go to `http://localhost:8000/`
 
+To edit JS in Chrome Developer Tools:
+1. Right-click in the left-side panel
+2. Select Add Folder to Workspace
+3. Choose location of local folder
+4. Click Allow
+5. Right-click on a file in the Sources left-side panel
+6. Choose Map to File System Resources
+7. Select the local file in the persistent workspace
+8. Reload the page
+9. Disable cache: Right-click and Inspect Element to open the DevTools. Now click Network in the toolbar. Finally, check the Disable cache checkbox at the top.
 
 ## License
 MIT
