@@ -142,6 +142,7 @@ var sample_training_instance = function() {
   }
 
   // fetch the appropriate row of the training image and reshape into a Vol
+  // p is data in the RGBA format, array of lenth 9408000: 3000 samples per batch, 28x28 sample, 4 channels RGBA
   var p = img_data[b].data;
   var x = new convnetjs.Vol(image_dimension,image_dimension,image_channels,0.0);
   var W = image_dimension*image_dimension;
