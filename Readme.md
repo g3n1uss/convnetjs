@@ -103,6 +103,7 @@ So to run the demo in Chome:
 3. open Chrome and go to `http://localhost:8000/`
 
 To edit JS in Chrome Developer Tools:
+
 1. Right-click in the left-side panel
 2. Select Add Folder to Workspace
 3. Choose location of local folder
