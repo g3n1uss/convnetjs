@@ -111,7 +111,7 @@ var paused = false;
 // train unless paused
 var load_and_step = function() {
   if(paused) return; 
-
+  // sample has volume object and the corresponding label
   var sample = sample_training_instance();
   step(sample); // process this image
   
@@ -144,6 +144,7 @@ var sample_training_instance = function() {
   // fetch the appropriate row of the training image and reshape into a Vol
   // p is data in the RGBA format, array of lenth 9408000: 3000 samples per batch, 28x28 sample, 4 channels RGBA
   var p = img_data[b].data;
+  // create object Vol: it has two arrays w and dw of length 784 filled with zeros at this point
   var x = new convnetjs.Vol(image_dimension,image_dimension,image_channels,0.0);
   var W = image_dimension*image_dimension;
   // the following part is very different from the web version, but does not make much difference
@@ -171,8 +172,15 @@ var sample_training_instance = function() {
   }*/
 
   // code from the web version
+  
+  // that is how we fill volume object V from data p, 
+  // it is pretty random and seems like have a potential problem
   for(var i=0;i<W;i++) {
-    var ix = ((W * k) + i) * 4;
+    var ix = ((W * k) + i) * 4;// k is a random sample within the batch
+    // 4 is coming from the fact that we deal with RGBA format, it has 4 channels
+
+    // this part is dangerous: k is a random number between 0 and 3000,
+    // on the other hand the length of p is 3000*W*4, so we have a potential index out of bound ix
     x.w[i] = p[ix]/255.0;
   }
   x = convnetjs.augment(x, 24);
@@ -185,10 +193,11 @@ var sample_training_instance = function() {
 
 // train on the picked sample and visualize the process
 var step = function(sample) {
-
+  // read off the data and the label
   var x = sample.x;
   var y = sample.label;
-
+  
+  // if sample is testing test and ge out, else - train on it
   if(sample.isval) {
     // use x to build our estimate of validation error
     net.forward(x);
@@ -268,7 +277,8 @@ var sample_test_instance = function() {
   var p = img_data[b].data;
   var x = new convnetjs.Vol(image_dimension,image_dimension,image_channels,0.0);
   var W = image_dimension*image_dimension;
-  var j=0;
+  // the following piece does not work and different from the web version 
+  /*var j=0;
   for(var dc=0;dc<image_channels;dc++) {
     var i=0;
     for(var xc=0;xc<image_dimension;xc++) {
@@ -300,6 +310,14 @@ var sample_test_instance = function() {
     }
   }else{
     xs.push(x, image_dimension, 0, 0, false); // push an un-augmented copy
+  }*/
+  for(var i=0;i<W;i++) {
+    var ix = ((W * k) + i) * 4;
+    x.w[i] = p[ix]/255.0;
+  }
+  var xs = [];
+  for(var i=0;i<4;i++) {
+    xs.push(convnetjs.augment(x, 24));
   }
   
   // return multiple augmentations, and we will average the network over them
@@ -675,6 +693,7 @@ var change_net = function() {
     newlayersconf.push(eval('({'+newlayerslist[i]+'})'));
   }
   // the following code will translate the configuration of layers as simple array 'layers_conf'' into the set of objects
+  net.conf_string=this.newnet.value;
   net.makeLayers(newlayersconf);
   reset_all();
 }
