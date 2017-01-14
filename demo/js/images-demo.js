@@ -107,7 +107,7 @@ var start_fun = function() {
 }
 
 // load a training image and train on it with the network
-var paused = false;
+var paused = true;
 // train unless paused
 var load_and_step = function() {
   if(paused) return; 
