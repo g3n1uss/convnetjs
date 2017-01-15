@@ -1767,6 +1767,7 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
         console.log("Warning: a regression net requires an array as training output vector.");
       
       this.k++;
+      // update weights after the whole batch is used
       if(this.k % this.batch_size === 0) {
 
         var pglist = this.net.getParamsAndGrads();

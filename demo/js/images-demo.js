@@ -701,6 +701,7 @@ var change_net = function() {
 var reset_all = function() {
   // reinit trainer
   trainer = new convnetjs.SGDTrainer(net, {learning_rate:trainer.learning_rate, momentum:trainer.momentum, batch_size:trainer.batch_size, l2_decay:trainer.l2_decay});
+  setTrainerParams();
   // reinit windows that keep track of val/train accuracies
   xLossWindow.reset();
   wLossWindow.reset();
