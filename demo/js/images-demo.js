@@ -624,7 +624,10 @@ var test_predict = function() {
     probsdiv.innerHTML = t;
     probsdiv.className = 'probsdiv';
     div.appendChild(probsdiv);
-
+    
+    // THERE WAS A BUG IN THE ORIGINAL PROJECT AT THIS POINT
+    // new pictures kept appearing and never got erased FIXED
+    
     // add it into DOM
     $(div).prependTo($("#testset_vis")).hide().fadeIn('slow').slideDown('slow');
     // keep always 'images_per_page' images
@@ -699,6 +702,11 @@ var change_net = function() {
 }
 
 var reset_all = function() {
+  // THERE WAS INCONSISTENCY IN THE ORIGINAL PROJECT At THIS POINT
+  // The original trainer was initilized with a specific training method,
+  // but after re-initializing we end up with the default trainer, so the 
+  // original 'training method' parameter was not kept
+
   // reinit trainer
   trainer = new convnetjs.SGDTrainer(net, {learning_rate:trainer.learning_rate, momentum:trainer.momentum, batch_size:trainer.batch_size, l2_decay:trainer.l2_decay});
   setTrainerParams();
