@@ -41,7 +41,8 @@ $(window).load(function() {
 
   // set up the trainer
   // default configuration
-  trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
+  // trainer = new convnetjs.SGDTrainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
+  trainer = new convnetjs.Trainer(net, {method:'adadelta', batch_size:20, l2_decay:0.001});
   
 
   // read off the rest of the parameters as defaults from the trainer
