@@ -1804,8 +1804,7 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
           var l2_decay = this.l2_decay * l2_decay_mul;
           var l1_decay = this.l1_decay * l1_decay_mul;
 
-          var plen = p.length;
-          for(var j=0;j<plen;j++) {
+          for(var j=0;j<p.length;j++) {
             l2_decay_loss += l2_decay*p[j]*p[j]/2; // accumulate weight decay loss
             l1_decay_loss += l1_decay*Math.abs(p[j]);
             var l1grad = l1_decay * (p[j] > 0 ? 1 : -1);
