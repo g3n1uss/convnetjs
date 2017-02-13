@@ -400,13 +400,16 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
       // optimized code by @mdda that achieves 2x speedup over previous version
 
       this.in_act = V;
+      // this will the act_out, it contains a matrix of weights and gradients 
+      // of dimensions 24*24*8, where 8 is the number of filters
       var A = new Vol(this.out_sx |0, this.out_sy |0, this.out_depth |0, 0.0);
       
       var V_sx = V.sx |0;
       var V_sy = V.sy |0;
       var xy_stride = this.stride |0;
-
+      // go through all filters
       for(var d=0;d<this.out_depth;d++) {
+        // current filter
         var f = this.filters[d];
         var x = -this.pad |0;
         var y = -this.pad |0;
@@ -568,18 +571,14 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
       return this.out_act;
     },
     backward: function() {
-      var V = this.in_act;
-      V.dw = global.zeros(V.w.length); // zero out the gradient in input Vol
-      
+      this.in_act.dw = global.zeros(this.in_act.w.length); // zero out the gradient in input Vol  
       // compute gradient wrt weights and data
       for(var i=0;i<this.out_depth;i++) {
-        var tfi = this.filters[i];
-        var chain_grad = this.out_act.dw[i];
         for(var d=0;d<this.num_inputs;d++) {
-          V.dw[d] += tfi.w[d]*chain_grad; // grad wrt input data
-          tfi.dw[d] += V.w[d]*chain_grad; // grad wrt params
+          this.in_act.dw[d] += this.filters[i].w[d]*this.out_act.dw[i]; // grad wrt input data
+          this.filters[i].dw[d] += this.in_act.w[d]*this.out_act.dw[i]; // grad wrt params
         }
-        this.biases.dw[i] += chain_grad;
+        this.biases.dw[i] += this.out_act.dw[i];
       }
     },
     getParamsAndGrads: function() {
@@ -1652,7 +1651,9 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
     // backprop: compute gradients wrt all parameters
     backward: function(y) {
       var N = this.layers.length;
+      // compute loss using only the last layer
       var loss = this.layers[N-1].backward(y); // last layer assumed to be loss layer
+      // now backpropagate and compute all the gradients
       for(var i=N-2;i>=0;i--) { // first layer assumed input
         this.layers[i].backward();
       }
@@ -1761,6 +1762,8 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
       var fwd_time = end - start;
 
       var start = new Date().getTime();
+      // loss is computed only by using the last layer, the rest of backward() function 
+      // backropagates through net and computes all the gradients
       var cost_loss = this.net.backward(y);
       var l2_decay_loss = 0.0;
       var l1_decay_loss = 0.0;
@@ -1773,8 +1776,14 @@ var convnetjs = convnetjs || { REVISION: 'ALPHA' };
       this.k++;
       // update weights after the whole batch is used
       if(this.k % this.batch_size === 0) {
-
+        // This is the pointer to parameters of the net (weights) and gradients,
+        // they will be modified in this function
         var pglist = this.net.getParamsAndGrads();
+        // Parameters include:
+        // - CONV weights in filters, biases in filters; 
+        // - FC weights and biases
+        // For example for the default configuration we have 25*8+8 parameters in conv filters
+        // and 1152*10+10 parameters in fc layer
 
         // initialize lists for accumulators. Will only be done once on first iteration
         if(this.gsum.length === 0 && (this.method !== 'sgd' || this.momentum > 0.0)) {
